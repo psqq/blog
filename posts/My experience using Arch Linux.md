@@ -2,7 +2,7 @@
 * Id поста: `432`.
 * Чтобы обсудить статью создайте [issue](https://github.com/psqq/blog/issues) с заголовком, который должен начинаться с id этого поста: `432: ...`.
 
-</hr>
+# My experience using Arch Linux
 
 <!-- begin post preview -->
 
