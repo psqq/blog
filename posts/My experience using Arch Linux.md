@@ -10,6 +10,8 @@
 
 <!-- end post preview -->
 
+Инструкции могут устареть поэтому пользуйтесь с осторожностью.
+
 # Особенности
 
 Из особенностей `Arch Linux` я бы выделил следующие:
@@ -34,15 +36,19 @@
 
 Далее загружаемся с флешки и выбираем пункт меню для установки (должно быть что-то вроде `Arch Linux install medium`).
 
+В установочном образе есть `tmux`.
+
 Сначала нужно убедится, что интернет работает:
 
 ```bash
 ping archlinux.org
 ```
 
-Если интернет проводной, то все должно подключится без проблем, `wi-fi` нужно [настроить](https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet), например, с помощью `nmtui`.
+Если интернет проводной, то все должно подключится без проблем, `Wi-Fi` нужно [настроить](https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet), например, с помощью [iwctl](https://wiki.archlinux.org/title/Iwd#iwctl).
 
 Далее идут команды для разметки диска. Вам нужно их скорректировать под ваши диск и ваши нужды. Размечаем диск, например, так для `GPT` (взято из [манула nixos](https://nixos.org/nixos/manual/index.html#sec-installation-partitioning-UEFI)):
+
+*Само собой, пути до дисков нужно указать ваши и выполнять только те команды для разметки диска, которые нужны вам.*
 
 ```bash
 parted /dev/sda -- mklabel gpt
@@ -68,8 +74,18 @@ mkfs.fat -F 32 -n boot /dev/sda1
 
 ```bash
 mount /dev/sdX1 /mnt
-pacstrap -K /mnt base linux linux-firmware vim grub networkmanager vi sudo zsh
+pacstrap -K /mnt base linux linux-firmware vim networkmanager vi sudo zsh grub efibootmgr
 ```
+
+Дополнительные пакеты:
+
+* `vim` - редактор
+* `networkmanager` - программа для управления сетевыми соединениями
+* `sudo` - для выполнения команд как рут пользователь из под обычного пользователя
+* `vi` - для `visudo`
+* `zsh` - использую из-за `Oh My Zsh`
+* `grub` - загрузчик ОС
+* `efibootmgr` - потребуется для установки загрузчика, если у вас `EFI`
 
 Далее монтируем `efi` раздел и создаем `/etc/fstab` файл:
 
@@ -116,13 +132,13 @@ pacman -S amd-ucode # для AMD
 pacman -S intel-ucode # для Intel
 ```
 
-Включаем сервис `NetworkManager`, чтобы не возится с настройкой сети. Если у вас `wi-fi`, то повозится придется и для этого есть `nmtui`.
+Включаем сервис `NetworkManager`, если вы его устанавливали. Вместе с пакетом `networkmanager` также идет удобная утилита с консольным `GUI`: `nmtui`. С помощью нее легко настроить `Wi-Fi` и другие сетевые подключения.
 
 ```bash
 systemctl enable NetworkManager
 ```
 
-Для определения других ОС загрузчиком `grub` нужно сделать [следующее](https://wiki.archlinux.org/title/GRUB#Detecting_other_operating_systems). Установить паке `os-prober`. И в файле `/etc/default/grub` раскомментировать `GRUB_DISABLE_OS_PROBER=false`.
+Для определения других ОС загрузчиком `grub` нужно сделать [следующее](https://wiki.archlinux.org/title/GRUB#Detecting_other_operating_systems). Установить паке `os-prober` и в файле `/etc/default/grub` раскомментировать `GRUB_DISABLE_OS_PROBER=false`.
 
 Устанавливаем загрузчик ОС:
 
@@ -130,6 +146,8 @@ systemctl enable NetworkManager
 grub-install
 grub-mkconfig -o /boot/grub/grub.cfg
 ```
+
+Не знаю почему, но `os-prober` у меня не находит `Windows` из `Live USB`. Только повторный запуск команд выше после перезагрузки из установленной ОС добавляет `Windows` в список выбора для запуска.
 
 Завершаем установку:
 
@@ -139,7 +157,7 @@ passwd
 
 # Добавляем рядового пользователя
 useradd -m -G wheel -s /bin/zsh USER_NAME
-# Заносим его в sudo (нужно раскомментировать строку для wheel)
+# Раскомментировать строку `%wheel ALL=(ALL:ALL) ALL`
 visudo
 
 # Устанавливаем пароль для пользователя
@@ -151,7 +169,7 @@ umount -R /mnt
 reboot
 ```
 
-После перезагрузки ОС должна работать и можно продолжить её настройку по вашему вкусу. Ниже в разделе `Настройка ОС` есть некоторые идеи.
+После перезагрузки ОС должна работать и можно продолжить её настройку по вашему вкусу. Ниже в разделе `Настройка ОС` есть некоторые идеи. Подразделы устроены так, что по ним можно идти последовательно.
 
 # Обновление
 
@@ -183,6 +201,7 @@ sudo pacman -Sy --needed archlinux-keyring && sudo pacman -Su
 
 ```bash
 sudo pacman -S xorg xfce4 xfce4-goodies
+# Шрифты для нормальной работы браузера
 sudo pacman -S ttf-liberation ttf-dejavu ttf-hack noto-fonts ttf-opensans ttf-roboto
 ```
 
@@ -192,7 +211,49 @@ sudo pacman -S ttf-liberation ttf-dejavu ttf-hack noto-fonts ttf-opensans ttf-ro
 exec startxfce4
 ```
 
-## Шрифты
+Запуск иксов:
+
+```bash
+startx
+```
+
+После установки `Xfce`, вы можете установить `sudo pacman -S firefox` и открыть этот гайд в браузере. Практически всегда, когда вы встречаете при установке пакетов предложения для выбора какой пакет установить, выбор по умолчанию является рекомендуемым выбором.
+
+## Windows
+
+`Arch Linux` может быть установлен бок о бок с `Windows`. Но следует (отключить)[] гибернацию и быстрый старт.
+
+### Монтирование раздела с Windows
+
+Для монитрования `NTFS` разделов с `Windows` понадобится пакет [ntfs-3g](https://wiki.archlinux.org/title/NTFS-3G):
+
+```bash
+sudo pacman -S ntfs-3g
+```
+
+Чтобы смонтировать `NTFS` раздел наберите:
+
+```bash
+mount /dev/your_NTFS_partition /mount/windows
+```
+
+Для автоматического монтирования при запуске системы нужно добавить в файл `/etc/fstab`:
+
+```conf
+UUID=0C12EF3A23FF133A /mnt/windows ntfs-3g defaults 0 0
+```
+
+### Время
+
+Детали [тут](https://wiki.archlinux.org/title/System_time#UTC_in_Microsoft_Windows).
+
+Если `Arch Linux` установлен вместе с `Windows`, то при переходе от одной ОС к другой у вас будет сбиваться время. Это связано с тем как ОС смотрят на время из аппаратных часов. `Arch Linux` считаем, что там `UTC`, а `Windows` локальное время. Нужно настроить операционные системы так, чтобы они воспринимали время из аппаратных часов одинаково. Рекомендуют делать так, чтобы `Windows` воспринимал время в `UTC`. Делается это запуском этой команды в коммандной строке `Windows` с правами администратора:
+
+```cmd
+reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f
+```
+
+### Шрифты
 
 О шрифтах есть страница на [вики](https://wiki.archlinux.org/title/fonts).
 
@@ -219,14 +280,19 @@ sudo fc-cache-32 --force
 Установка [Oh My Zsh](github.com/ohmyzsh/ohmyzsh) фреймворка для конфигурации `zsh`:
 
 ```bash
+sudo pacman -S git
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
 ```
 
-Одна из тем для `Oh My Zsh`: [powerlevel10k](https://github.com/romkatv/powerlevel10k). Тема требует [специальные шрифты Meslo Nerd Font](https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#meslo-nerd-font-patched-for-powerlevel10k), которые можно установить в систему с помощью `gnome-font-viewer`, либо воспользоваться инструкцией с [вики](https://wiki.archlinux.org/title/fonts#Installation).
+Одна из тем для `Oh My Zsh` - [powerlevel10k](https://github.com/romkatv/powerlevel10k).
+
+Тема требует [специальные шрифты Meslo Nerd Font](https://github.com/romkatv/powerlevel10k?tab=readme-ov-file#meslo-nerd-font-patched-for-powerlevel10k), которые можно установить в систему с помощью `gnome-font-viewer`, либо воспользоваться инструкцией с [вики](https://wiki.archlinux.org/title/fonts#Installation). На странице `powerlevel10k` есть инструкции как установить этот шрифт для разных эмуляторов терминала.
 
 ```bash
 sudo pacman -S gnome-font-viewer
 ```
+
+После установки `gnome-font-viewer` шрифты должны открываться по двойному клику и устанавливаться по нажатию кнопки `Install`.
 
 ## yay
 
@@ -280,16 +346,6 @@ ExecStart=-/usr/bin/agetty --autologin USER_NAME --noclear %I $TERM
 if [ "$(tty)" = /dev/tty1 ]; then
     exec startx
 fi
-```
-
-## Windows и время
-
-Детали [тут](https://wiki.archlinux.org/title/System_time#UTC_in_Microsoft_Windows).
-
-Если `Arch Linux` установлен вместе с `Windows`, то при переходе от одной ОС к другой у вас будет сбиваться время. Это связано с тем как ОС смотрят на время из аппаратных часов. `Arch Linux` считаем, что там `UTC`, а `Windows` локальное время. Нужно настроить операционные системы так, чтобы они воспринимали время из аппаратных часов одинаково. Рекомендуют делать так, чтобы `Windows` воспринимал время в `UTC`. Делается это запуском этой команды в коммандной строке `Windows` с правами администратора:
-
-```cmd
-reg add "HKEY_LOCAL_MACHINE\System\CurrentControlSet\Control\TimeZoneInformation" /v RealTimeIsUniversal /d 1 /t REG_DWORD /f
 ```
 
 ## Сон и гибернация
