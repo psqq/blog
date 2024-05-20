@@ -44,7 +44,7 @@
 ping archlinux.org
 ```
 
-Если интернет проводной, то все должно подключится без проблем, `Wi-Fi` нужно [настроить](https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet), например, с помощью [iwctl](https://wiki.archlinux.org/title/Iwd#iwctl).
+Проводной интернет должен подключится сам, `Wi-Fi` нужно [настроить](https://wiki.archlinux.org/title/Installation_guide#Connect_to_the_internet), например, с помощью [iwctl](https://wiki.archlinux.org/title/Iwd#iwctl).
 
 Далее идут команды для разметки диска. Вам нужно их скорректировать под ваши диск и ваши нужды. Размечаем диск, например, так для `GPT` (взято из [манула nixos](https://nixos.org/nixos/manual/index.html#sec-installation-partitioning-UEFI)):
 
