@@ -387,6 +387,24 @@ fi
 systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 ```
 
+## На случай откатка с ошибками
+
+```bash
+sudo pacman -Sy archlinux-keyring
+# или sudo pacman -S archlinux-keyring --noprofirm --needed
+
+# Сброс ключей
+sudo rm -rf /etc/pacman.d/gnupg
+sudo pacman-key --init
+sudo pacman-key --populate archlinux
+
+# Очистка кэша
+sudo pacman -Sc
+
+sudo pacman -Syyuu
+# или sudo pacman -Syyuu --overwrite="*"
+```
+
 # Приложения
 
 ## mirrorlist
@@ -394,12 +412,47 @@ systemctl mask sleep.target suspend.target hibernate.target hybrid-sleep.target
 Мой `/etc/pacman.d/mirrorlist` (на 2024.05.13):
 
 ```conf
-#Server=https://archive.archlinux.org/repos/2023/10/01/$repo/os/$arch
-#Server=https://archive.archlinux.org/repos/2023/11/01/$repo/os/$arch
-#Server=https://archive.archlinux.org/repos/2023/12/01/$repo/os/$arch
-#Server=https://archive.archlinux.org/repos/2024/02/01/$repo/os/$arch
-#Server=https://archive.archlinux.org/repos/2024/04/20/$repo/os/$arch
-Server=https://archive.archlinux.org/repos/2024/05/10/$repo/os/$arch
+# рабочии
+#Server = http://mirror.yandex.ru/archlinux/$repo/os/$arch
+#Server = https://mirror.yandex.ru/archlinux/$repo/os/$arch
+#Server = http://mirror.surf/archlinux/$repo/os/$arch
+#Server = https://mirror.surf/archlinux/$repo/os/$arch
+#Server = http://mirror.nw-sys.ru/archlinux/$repo/os/$arch
+#Server = https://mirror.nw-sys.ru/archlinux/$repo/os/$arch
+#Server = http://mirrors.powernet.com.ru/archlinux/$repo/os/$arch
+#Server = http://mirror.rol.ru/archlinux/$repo/os/$arch
+#Server = https://mirror.rol.ru/archlinux/$repo/os/$arch
+#Server = http://mirror.truenetwork.ru/archlinux/$repo/os/$arch
+#Server = https://mirror.truenetwork.ru/archlinux/$repo/os/$arch
+#Server = http://archlinux.zepto.cloud/$repo/os/$arch
+
+# рабочии
+#Server = https://archive.archlinux.org/repos/2024/12/25/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/01/19/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/03/05/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/04/20/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/04/21/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/05/20/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/06/26/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/08/01/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/08/15/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/09/01/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/09/12/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/09/28/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/10/10/$repo/os/$arch
+
+# баг в gnome
+#Server = https://archive.archlinux.org/repos/2025/10/24/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/11/08/$repo/os/$arch
+
+# рабочии
+#Server = https://archive.archlinux.org/repos/2025/11/29/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2025/12/12/$repo/os/$arch
+#Server = https://archive.archlinux.org/repos/2026/01/10/$repo/os/$arch
+Server = https://archive.archlinux.org/repos/2026/01/30/$repo/os/$arch
+
+# проблемы со звуком в gnome
+#Server = https://archive.archlinux.org/repos/2026/02/20/$repo/os/$arch
 ```
 
 ## ru mirrorlist
